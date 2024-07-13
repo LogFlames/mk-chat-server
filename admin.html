@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-button {
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .message {
+            text-align: center;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create User</h1>
+        <form id="createUserForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <input type="submit" value="Create User">
+        </form>
+        <div class="message" id="message"></div>
+
+        <h2>Users</h2>
+        <ul id="userList"></ul>
+
+        <h2>Posts</h2>
+        <ul id="postList"></ul>
+    </div>
+
+    <script>
+        document.getElementById('createUserForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const message = document.getElementById('message');
+
+            try {
+                const response = await fetch('/create-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.ok) {
+                    message.style.color = 'green';
+                    message.textContent = 'User created successfully';
+                    fetchUsers(); // Refresh the user list
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = 'Failed to create user';
+                }
+            } catch (error) {
+                message.style.color = 'red';
+                message.textContent = 'An error occurred';
+                console.error('Error:', error);
+            }
+        });
+
+        async function fetchUsers() {
+            const response = await fetch('/users');
+            const users = await response.json();
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = `${user.name} (ID: ${user.id})`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => deleteUser(user.id);
+
+                li.appendChild(deleteButton);
+                userList.appendChild(li);
+            });
+        }
+
+        async function deleteUser(id) {
+            const message = document.getElementById('message');
+
+            try {
+                const response = await fetch('/delete-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                });
+
+                if (response.ok) {
+                    message.style.color = 'green';
+                    message.textContent = `User with id ${id} deleted successfully`;
+                    fetchUsers(); // Refresh the user list
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = 'Failed to delete user';
+                }
+            } catch (error) {
+                message.style.color = 'red';
+                message.textContent = 'An error occurred';
+                console.error('Error:', error);
+            }
+        }
+
+        async function fetchPosts() {
+            const response = await fetch('/posts');
+            const posts = await response.json();
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            posts.forEach(post => {
+                const li = document.createElement('li');
+                li.textContent = `${post.message} (ID: ${post.id}, User ID: ${post.userid})`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => deletePost(post.id);
+
+                li.appendChild(deleteButton);
+                postList.appendChild(li);
+            });
+        }
+
+        async function deletePost(id) {
+            const message = document.getElementById('message');
+
+            try {
+                const response = await fetch('/delete-post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                });
+
+                if (response.ok) {
+                    message.style.color = 'green';
+                    message.textContent = `Post with id ${id} deleted successfully`;
+                    fetchPosts(); // Refresh the post list
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = 'Failed to delete post';
+                }
+            } catch (error) {
+                message.style.color = 'red';
+                message.textContent = 'An error occurred';
+                console.error('Error:', error);
+            }
+        }
+
+        // Fetch users and posts when the page loads
+        fetchUsers();
+        fetchPosts();
+    </script>
+</body>
+</html>
+
