@@ -18,14 +18,14 @@ const authenticate = (req, res, next) => {
     if (token) {
         jwt.verify(token, SECRET_KEY, (err, decoded) => {
             if (err) {
-                res.status(401).send('Unauthorized');
+                return res.sendStatus(401);
             } else {
                 req.user = decoded;
                 next();
             }
         });
     } else {
-        res.status(401).send('Unauthorized');
+        return res.sendStatus(401);
     }
 };
 
@@ -41,9 +41,9 @@ app.post('/login', (req, res) => {
         const token = jwt.sign({ user: 'admin' }, SECRET_KEY, { expiresIn: '1h' });
 
         res.cookie('token', token, { httpOnly: true, maxAge: 3600000 }); // 1 hour
-        res.status(200).send('Login successful');
+        return res.status(200).send('Login successful');
     } else {
-        res.status(401).send('Invalid password');
+        return res.status(401).send('Invalid password');
     }
 });
 
@@ -133,15 +133,15 @@ app.delete('/post', async (req, res) => {
     let post = await db.getPost(id);
 
     if (user === undefined) {
-        res.sendStatus(401);
+        return res.sendStatus(401);
     }
 
     if (post === undefined) {
-        res.sendStatus(404);
+        return res.sendStatus(404);
     }
 
     if (post.userid !== user.id) {
-        res.sendStatus(401);
+        return res.sendStatus(401);
     }
 
     db.deletePost(id);
