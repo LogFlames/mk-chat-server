@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Posts</h1>
+        <ul id="postList"></ul>
+    </div>
+
+    <script>
+        async function fetchPosts() {
+            const users_response = await fetch('/users');
+            const users = await users_response.json();
+            const response = await fetch('/posts');
+            const posts = await response.json();
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            posts.forEach(post => {
+                let username = "Unknown";
+                const li = document.createElement('li');
+                for (let user of users) {
+                    if (user.id === post.userid) {
+                        username = user.name;
+                        break;
+                    }
+                }
+                li.textContent = `${username}: ${post.message}`;
+                postList.appendChild(li);
+            });
+        }
+
+        function startPolling() {
+            fetchPosts();
+            setInterval(fetchPosts, 500); // Fetch posts every 5 seconds
+        }
+
+        // Start polling for posts when the page loads
+        window.onload = startPolling;
+    </script>
+</body>
+</html>
+

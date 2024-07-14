@@ -38,8 +38,13 @@ module.exports = {
             callback(result)
         });
     },
+    getPosts: function(pageSize, page, callback) {
+        _db.collection('posts').find({},{projection:{_id: false}}).sort({createat: -1}).skip(page * pageSize).limit(pageSize).toArray().then(result => {
+            callback(result);
+        });
+    },
     getAllPosts: function(callback) {
-        _db.collection('posts').find({},{projection:{_id: false}}).toArray().then(result => {
+        _db.collection('posts').find({},{projection:{_id: false}}).sort({createat: -1}).toArray().then(result => {
             callback(result);
         });
     },
@@ -53,7 +58,8 @@ module.exports = {
     },
     createPost: function(userid, message) {
         let id = uuidv4();
-        _db.collection('posts').insertOne({id: id, userid: userid, message: message});
+        let now = Date.now();
+        _db.collection('posts').insertOne({id: id, userid: userid, message: message, createat: now});
         return id;
     }
 }

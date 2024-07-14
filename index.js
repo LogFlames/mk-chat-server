@@ -92,20 +92,31 @@ app.get('/users', (req, res) => {
 });
 
 app.get('/posts', (req, res) => {
-    db.getAllPosts((data) => {
+    let { page, pageSize } = req.query;
+
+    page = page || 0;
+    pageSize = pageSize || 20;
+
+    if (page < 0) {
+        return res.status(400).send("Invalid page, cannot have negative page.");
+    }
+
+    pageSize = Math.min(Math.max(pageSize, 1), 50);
+
+    db.getPosts(pageSize, page, (data) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(data, null, 1));
     });
 });
 
-app.post('/post', (req, res) => {
+app.post('/post', async (req, res) => {
     const { token, message } = req.body;
 
     if (token === undefined || message === undefined) {
         return res.sendStatus(400);
     }
 
-    let user = db.getUserFromToken(token);
+    let user = await db.getUserFromToken(token);
 
     if (user === undefined) {
         return res.sendStatus(401);
@@ -115,11 +126,11 @@ app.post('/post', (req, res) => {
     res.status(200).send(id);
 });
 
-app.delete('/post', (req, res) => {
+app.delete('/post', async (req, res) => {
     const { token, id } = req.body;
 
-    let user = db.getUserFromToken(token);
-    let post = db.getPost(id);
+    let user = await db.getUserFromToken(token);
+    let post = await db.getPost(id);
 
     if (user === undefined) {
         res.sendStatus(401);
@@ -136,5 +147,12 @@ app.delete('/post', (req, res) => {
     db.deletePost(id);
     res.sendStatus(200);
 });
+
+app.get('/display', (req, res) => {
+    let options = {
+        root: path.join(__dirname)
+    }
+    res.sendFile('display.html', options);
+})
 
 server.listen(8045, () => console.log("Lisening on port :8045"));
