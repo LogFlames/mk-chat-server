@@ -108,7 +108,7 @@
 
                 if (response.ok) {
                     message.style.color = 'green';
-                    message.textContent = 'User created successfully';
+                    message.textContent = `User created successfully: ${response.message}`;
                     fetchUsers(); // Refresh the user list
                 } else {
                     message.style.color = 'red';
