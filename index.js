@@ -148,7 +148,7 @@ app.delete('/post', async (req, res) => {
     res.sendStatus(200);
 });
 
-app.get('/display', (req, res) => {
+app.get(['/', '/display'], (req, res) => {
     let options = {
         root: path.join(__dirname)
     }
