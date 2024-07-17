@@ -66,7 +66,7 @@ app.post('/create-user', authenticate, (req, res) => {
     const { name } = req.body;
 
     db.createUser(name, (token) => {
-        res.status(200).send(token);
+        res.status(200).send(token.toString());
     });
 });
 
