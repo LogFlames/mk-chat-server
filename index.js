@@ -95,7 +95,7 @@ app.get('/posts', (req, res) => {
     let { page, pageSize } = req.query;
 
     page = page || 0;
-    pageSize = pageSize || 20;
+    pageSize = pageSize || 10;
 
     if (page < 0) {
         return res.status(400).send("Invalid page, cannot have negative page.");
