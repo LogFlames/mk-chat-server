@@ -17,7 +17,7 @@ MongoClient.connect(url).then((client) => {
 
 module.exports = {
     createUser: async function(name, callback) {
-        let token = uuidv4();
+        let token = Math.floor((0.9 * Math.random() + 0.1) * 1000000);
         let maxId = await _db.collection('users').find({},{projection:{id: true, _id: false}}).sort({id: -1}).limit(1).toArray();
         if (maxId.length == 0) {
             maxId = -1;
