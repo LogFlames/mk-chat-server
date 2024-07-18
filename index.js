@@ -9,8 +9,8 @@ const jwt = require('jsonwebtoken');
 
 const { v4: uuidv4 } = require('uuid');
 
-const SECRET_KEY = 'your_secret_key';
-const PASSWORD = '123'; // Replace with your desired password
+const SECRET_KEY = 'aeosunthaoesunth';
+const PASSWORD = 'admin123'; // Replace with your desired password
 
 const authenticate = (req, res, next) => {
     const token = req.cookies.token;
