@@ -42,8 +42,14 @@
         async function fetchPosts() {
             const users_response = await fetch('/users');
             const users = await users_response.json();
-            const response = await fetch('/posts');
-            const posts = await response.json();
+            const posts = [];
+            let page = 0;
+            let res = [1];
+            while (res.length > 0) {
+                const response = await fetch(`/posts?page=${}`);
+                res = await response.json();
+                posts.concat(res);
+            }
             const postList = document.getElementById('postList');
             postList.innerHTML = '';
 
