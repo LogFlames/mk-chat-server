@@ -42,13 +42,14 @@
         async function fetchPosts() {
             const users_response = await fetch('/users');
             const users = await users_response.json();
-            const posts = [];
+            let posts = [];
             let page = 0;
             let res = [1];
             while (res.length > 0) {
-                const response = await fetch(`/posts?page=${}`);
+                const response = await fetch(`/posts?page=${page}`);
                 res = await response.json();
-                posts.concat(res);
+                posts = posts.concat(res);
+                page++;
             }
             const postList = document.getElementById('postList');
             postList.innerHTML = '';
@@ -69,7 +70,7 @@
 
         function startPolling() {
             fetchPosts();
-            setInterval(fetchPosts, 500); // Fetch posts every 5 seconds
+            setInterval(fetchPosts, 1000); // Fetch posts every 5 seconds
         }
 
         // Start polling for posts when the page loads

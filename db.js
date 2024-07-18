@@ -59,7 +59,7 @@ module.exports = {
         return posts[0];
     },
     getUserFromToken: async function(token) {
-        let users = await _db.collection('users').find({ token }).toArray();
+        let users = await _db.collection('users').find({ token: Number(token) }).toArray();
         return users[0];
     },
     createPost: function(userid, message) {
